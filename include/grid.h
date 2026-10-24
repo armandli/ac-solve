@@ -3,6 +3,7 @@
 
 #include <array>
 #include <istream>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,9 @@ struct Offset {
   int dr;
   int dc;
 };
+
+// Up, right, down, left: stepping to the next entry is a 90 degree right turn.
+inline constexpr s::array<Offset, 4> kNeighbors4 = {{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}};
 
 inline constexpr s::array<Offset, 8> kNeighbors8 = {{
   {-1, -1}, {-1, 0}, {-1, 1},
@@ -35,6 +39,22 @@ inline Grid read_grid(s::istream& in) {
 inline bool in_bounds(const Grid& grid, int row, int col) {
   return row >= 0 and row < static_cast<int>(grid.size()) and col >= 0 and
          col < static_cast<int>(grid[row].size());
+}
+
+struct Cell {
+  int row;
+  int col;
+
+  bool operator==(const Cell&) const = default;
+};
+
+// First cell holding `ch` in reading order.
+inline opt<Cell> find_cell(const Grid& grid, char ch) {
+  for (int row = 0; row < static_cast<int>(grid.size()); ++row) {
+    size_t col = grid[row].find(ch);
+    if (col != str::npos) return Cell{row, static_cast<int>(col)};
+  }
+  return s::nullopt;
 }
 
 // Number of the eight surrounding cells holding `ch`.

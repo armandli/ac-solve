@@ -6,6 +6,7 @@
 
 #include <charconv>
 #include <istream>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -20,6 +21,11 @@ inline vec<str> read_lines(s::istream& in) {
     lines.push_back(line);
   }
   return lines;
+}
+
+// The whole stream, newlines included.
+inline str read_all(s::istream& in) {
+  return str(s::istreambuf_iterator<char>(in), {});
 }
 
 // Assumes `text` is entirely a base-10 integer; asserts otherwise.
