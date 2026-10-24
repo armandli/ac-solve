@@ -56,9 +56,10 @@ inline strv trim(strv text) {
   return text.substr(first, last - first + 1);
 }
 
-// Every run of decimal digits in `text`, in order. Signs are not recognized.
-template<typename T = long long>
-vec<T> extract_numbers(strv text) {
+// Every run of decimal digits in `text`, in order, negated when `signed_runs`
+// and directly preceded by '-'.
+template<typename T>
+vec<T> scan_numbers(strv text, bool signed_runs) {
   vec<T> numbers;
   size_t i = 0;
   while (i < text.size()) {
@@ -68,10 +69,23 @@ vec<T> extract_numbers(strv text) {
     }
     size_t j = i;
     while (j < text.size() and s::isdigit(static_cast<unsigned char>(text[j]))) ++j;
-    numbers.push_back(parse_int<T>(text.substr(i, j - i)));
+    T value = parse_int<T>(text.substr(i, j - i));
+    numbers.push_back(signed_runs and i > 0 and text[i - 1] == '-' ? -value : value);
     i = j;
   }
   return numbers;
+}
+
+// Every run of decimal digits in `text`, in order. Signs are not recognized.
+template<typename T = long long>
+vec<T> extract_numbers(strv text) {
+  return scan_numbers<T>(text, false);
+}
+
+// Like extract_numbers, but a '-' directly before the digits negates them.
+template<typename T = long long>
+vec<T> extract_signed_numbers(strv text) {
+  return scan_numbers<T>(text, true);
 }
 
 #endif  // INPUT_H
