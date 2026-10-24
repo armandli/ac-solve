@@ -32,6 +32,8 @@ foreach(YEAR_DIR ${YEAR_DIRS})
     set(TARGET ${YEAR}_${NAME})
     add_executable(${TARGET} ${SOURCE})
     target_link_libraries(${TARGET} PRIVATE aoc_shared)
+    # Headers shared between the parts of a problem live next to the sources.
+    target_include_directories(${TARGET} PRIVATE ${YEAR_DIR})
     set_target_properties(${TARGET} PROPERTIES
       OUTPUT_NAME ${NAME}
       RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${YEAR})
